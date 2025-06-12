@@ -1,5 +1,6 @@
 import { AMINO_ACID_COLORS } from "../lib/constants";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useToast } from "../hooks/use-toast";
 
 interface SequenceAlignmentProps {
   firstSequence: string;
@@ -12,6 +13,18 @@ export function SequenceAlignment({
 }: SequenceAlignmentProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [partSize, setPartSize] = useState(10);
+  const { toast } = useToast();
+
+  const copySequence = () => {
+    const selectedText = window.getSelection()?.toString();
+    if (selectedText && selectedText.trim()) {
+      navigator.clipboard.writeText(selectedText.trim());
+      toast({
+        title: "Скопировано",
+        description: "Последовательность скопирована в буфер обмена",
+      });
+    }
+  };
 
   useEffect(() => {
     const updatePartSize = () => {
@@ -41,8 +54,25 @@ export function SequenceAlignment({
   const firstSequenceParts = getParts(firstSequence);
   const secondSequenceParts = getParts(secondSequence);
 
+  const overlayContent = useMemo(() => {
+    const buf: string[] = [];
+    for (let i = 0; i < firstSequence.length; i += partSize) {
+      buf.push(
+        firstSequence.slice(i, i + partSize),
+        "\n",
+        secondSequence.slice(i, i + partSize),
+        i + partSize < firstSequence.length ? "\n" : ""
+      );
+    }
+    return buf.join("");
+  }, [firstSequence, secondSequence, partSize]);
+
   return (
-    <div ref={containerRef} className="relative w-full font-mono">
+    <div
+      ref={containerRef}
+      className="relative w-full font-mono"
+      onMouseUp={copySequence}
+    >
       {firstSequenceParts.map((firstPart: string, partIndex: number) => {
         const secondPart = secondSequenceParts[partIndex];
         return (
@@ -70,16 +100,16 @@ export function SequenceAlignment({
               ))}
             </div>
             <pre
-              className="absolute top-0 left-0 select-text pointer-events-none font-mono m-0"
+              className="absolute top-0 left-0 select-text pointer-events-none font-mono m-0 break-all whitespace-pre-wrap"
               style={{
                 color: "transparent",
-                whiteSpace: "pre",
                 lineHeight: "2rem",
-                letterSpacing: "1.5rem",
-                paddingLeft: "0.75rem",
+                letterSpacing: "calc(2rem - 1ch)",
+                paddingLeft: "calc(1rem - 0.5ch)",
+                maxWidth: "100%",
               }}
             >
-              {firstPart + "\n" + secondPart}
+              {overlayContent}
             </pre>
           </div>
         );

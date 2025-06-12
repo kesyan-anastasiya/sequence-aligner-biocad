@@ -1,0 +1,1 @@
+{"root":["./vite.config.ts","./src/app.tsx","./src/main.tsx","./src/components/sequencealignment.tsx","./src/components/ui/button.tsx","./src/components/ui/input.tsx","./src/lib/constants.ts","./src/lib/utils.ts"],"errors":true,"version":"5.8.3"}

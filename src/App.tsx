@@ -4,6 +4,7 @@ import { Input } from "./components/ui/input";
 import { useState } from "react";
 import { AMINO_ACIDS } from "./lib/constants";
 import { SequenceAlignment } from "./components/SequenceAlignment";
+import { Toaster } from "./components/ui/toaster";
 
 function App() {
   const [firstSequence, setFirstSequence] = useState("");
@@ -81,6 +82,7 @@ function App() {
           />
         </div>
       )}
+      <Toaster />
     </div>
   );
 }
