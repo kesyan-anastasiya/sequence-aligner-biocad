@@ -29,9 +29,10 @@ export function SequenceAlignment({
   useEffect(() => {
     const updatePartSize = () => {
       if (containerRef.current) {
-        const containerWidth = containerRef.current.offsetWidth;
-        const symbolsPerLine = Math.floor(containerWidth / 32);
-        setPartSize(Math.max(1, symbolsPerLine));
+        const containerWidth = containerRef.current.offsetWidth;  
+        if (containerWidth < 32) return;
+        const symbolsPerLine = Math.max(10, Math.floor(containerWidth / 32));
+        setPartSize(symbolsPerLine);
       }
     };
 

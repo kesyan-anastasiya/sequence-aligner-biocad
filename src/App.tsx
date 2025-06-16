@@ -11,8 +11,10 @@ function App() {
   const [secondSequence, setSecondSequence] = useState("");
   const [error, setError] = useState("");
   const [showAlignment, setShowAlignment] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isLocked) return;
     const input = e.target.value.toUpperCase();
     const hasInvalidChars = input
       .split("")
@@ -44,6 +46,12 @@ function App() {
     }
     setError("");
     setShowAlignment(true);
+    setIsLocked(true);
+  };
+
+  const handleEdit = () => {
+    setIsLocked(false);
+    setShowAlignment(false);
   };
 
   return (
@@ -56,6 +64,7 @@ function App() {
           onChange={handleInputChange}
           className="text-[10px] sm:text-sm md:text-base"
           required
+          disabled={isLocked}
         />
         <Input
           name="secondSequence"
@@ -64,22 +73,44 @@ function App() {
           onChange={handleInputChange}
           className="text-[10px] sm:text-sm md:text-base"
           required
+          disabled={isLocked}
         />
-        {error && <div className="text-red-500 text-sm">{error}</div>}
-        <Button
-          variant="outline"
-          onClick={handleSubmit}
-          className="text-xs sm:text-sm md:text-base"
-        >
-          Выровнять
-        </Button>
+        {error && (
+          <div className="text-red-500 text-xs sm:text-sm md:text-base">
+            {error}
+          </div>
+        )}
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={handleSubmit}
+            className="text-xs sm:text-sm md:text-base flex-1"
+            disabled={isLocked}
+          >
+            Выровнять
+          </Button>
+          {isLocked && (
+            <Button
+              variant="outline"
+              onClick={handleEdit}
+              className="text-xs sm:text-sm md:text-base"
+            >
+              Редактировать
+            </Button>
+          )}
+        </div>
       </div>
-      {showAlignment && (
+      {showAlignment && firstSequence.length === secondSequence.length && (
         <div className="mt-8 w-full max-w-md overflow-x-auto">
           <SequenceAlignment
             firstSequence={firstSequence}
             secondSequence={secondSequence}
           />
+        </div>
+      )}
+      {showAlignment && firstSequence.length !== secondSequence.length && (
+        <div className="mt-8 w-full max-w-md text-red-500 text-xs sm:text-sm md:text-base">
+          Длины последовательностей должны совпадать для выравнивания
         </div>
       )}
       <Toaster />
