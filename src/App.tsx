@@ -36,8 +36,21 @@ function App() {
   };
 
   const handleSubmit = () => {
+    const isFirstInvalid = firstSequence
+      .split("")
+      .some((char: string) => !AMINO_ACIDS.includes(char) && char !== "");
+    const isSecondInvalid = secondSequence
+      .split("")
+      .some((char: string) => !AMINO_ACIDS.includes(char) && char !== "");
+
     if (!firstSequence || !secondSequence) {
       setError("Оба поля обязательны для заполнения");
+      return;
+    }
+    if (isFirstInvalid || isSecondInvalid) {
+      setError(
+        "Проверьте раскладку клавиатуры. Допустимы только латинские буквы: A, R, N, D, C, E, Q, G, H, I, L, K, M, F, P, S, T, W, Y, V и символ -"
+      );
       return;
     }
     if (firstSequence.length !== secondSequence.length) {
@@ -85,7 +98,7 @@ function App() {
             variant="outline"
             onClick={handleSubmit}
             className="text-xs sm:text-sm md:text-base flex-1"
-            disabled={isLocked}
+            disabled={isLocked || !!error}
           >
             Выровнять
           </Button>
