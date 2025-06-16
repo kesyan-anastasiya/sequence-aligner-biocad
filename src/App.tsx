@@ -6,6 +6,12 @@ import { AMINO_ACIDS } from "./lib/constants";
 import { SequenceAlignment } from "./components/SequenceAlignment";
 import { Toaster } from "./components/ui/toaster";
 
+function hasInvalidChars(str: string) {
+  return str
+    .split("")
+    .some((char: string) => !AMINO_ACIDS.includes(char) && char !== "");
+}
+
 function App() {
   const [firstSequence, setFirstSequence] = useState("");
   const [secondSequence, setSecondSequence] = useState("");
@@ -15,12 +21,13 @@ function App() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (isLocked) return;
-    const input = e.target.value.toUpperCase();
-    const hasInvalidChars = input
-      .split("")
-      .some((char: string) => !AMINO_ACIDS.includes(char) && char !== "");
+    const { name, value } = e.target;
+    const input = value.toUpperCase();
 
-    if (hasInvalidChars) {
+    const newFirst = name === "firstSequence" ? input : firstSequence;
+    const newSecond = name === "secondSequence" ? input : secondSequence;
+
+    if (hasInvalidChars(newFirst) || hasInvalidChars(newSecond)) {
       setError(
         "Проверьте раскладку клавиатуры. Допустимы только латинские буквы: A, R, N, D, C, E, Q, G, H, I, L, K, M, F, P, S, T, W, Y, V и символ -"
       );
@@ -28,7 +35,7 @@ function App() {
       setError("");
     }
 
-    if (e.target.name === "firstSequence") {
+    if (name === "firstSequence") {
       setFirstSequence(input);
     } else {
       setSecondSequence(input);
@@ -36,18 +43,11 @@ function App() {
   };
 
   const handleSubmit = () => {
-    const isFirstInvalid = firstSequence
-      .split("")
-      .some((char: string) => !AMINO_ACIDS.includes(char) && char !== "");
-    const isSecondInvalid = secondSequence
-      .split("")
-      .some((char: string) => !AMINO_ACIDS.includes(char) && char !== "");
-
     if (!firstSequence || !secondSequence) {
       setError("Оба поля обязательны для заполнения");
       return;
     }
-    if (isFirstInvalid || isSecondInvalid) {
+    if (hasInvalidChars(firstSequence) || hasInvalidChars(secondSequence)) {
       setError(
         "Проверьте раскладку клавиатуры. Допустимы только латинские буквы: A, R, N, D, C, E, Q, G, H, I, L, K, M, F, P, S, T, W, Y, V и символ -"
       );
